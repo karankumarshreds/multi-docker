@@ -6,3 +6,14 @@ before_install:
         - docker build -t karanshreds/react-test -f ./client/Dockerfile.dev ./client
 script: 
         - docker run -e CI=true karanshreds/react-test npm test 
+
+after_success: 
+        - docker build -t karanshreds/multi-client ./client
+        - docker build -t karanshreds/multi-worker ./worker
+        - docker build -t karanshreds/multi-server ./server
+        - docker build -t karanshreds/multi-nginx ./nginx
+        - echo "$docker_password" | docker push -u "$docker_username" --password-stdin
+        - docker push karanshreds/multi-client 
+        - docker push karanshreds/multi-server
+        - docker push karanshreds/multi-nginx 
+        - docker push karanshreds/multi-worker
